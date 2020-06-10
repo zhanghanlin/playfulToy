@@ -1,12 +1,14 @@
 package com.demo.playful.toy;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.text.ParseException;
-import java.util.Calendar;
+import java.util.*;
 
 /**
  * EightCharacters
@@ -24,23 +26,27 @@ public class EightCharacters {
      * 最大年
      */
     public static final int MAX_YEAR = 2099;
+    /**
+     * 日期格式化-生日
+     */
+    private static final String DATE_FORMAT_BIRTH = "yyyy-MM-dd HH";
 
     /**
      * 年-月天干对应表
      * key-年天干码
-     * value-月天干对应的天干吗,数组索引表示农历月(下表从0开始,即0表示1月)
+     * value-月天干对应的索引,数组索引表示农历月(下表从0开始,即0表示1月)
      */
     private static final ImmutableMap<Integer, Integer[]> YEAR_MONTH_HEAVENLY_STEM_MAPPING = ImmutableMap.<Integer, Integer[]>builder().
-            put(1, new Integer[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1}).
-            put(6, new Integer[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1}).
-            put(2, new Integer[]{2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3}).
-            put(7, new Integer[]{2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3}).
-            put(3, new Integer[]{4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5}).
-            put(8, new Integer[]{4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5}).
-            put(4, new Integer[]{6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7}).
-            put(9, new Integer[]{6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7}).
-            put(0, new Integer[]{8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9}).
-            put(5, new Integer[]{8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9}).
+            put(1, new Integer[]{7, 8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8}).
+            put(6, new Integer[]{7, 8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8}).
+            put(2, new Integer[]{9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}).
+            put(7, new Integer[]{9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}).
+            put(3, new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1, 2}).
+            put(8, new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1, 2}).
+            put(4, new Integer[]{3, 4, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4}).
+            put(9, new Integer[]{3, 4, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4}).
+            put(0, new Integer[]{5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6}).
+            put(5, new Integer[]{5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6}).
             build();
 
     /**
@@ -73,72 +79,87 @@ public class EightCharacters {
      *
      * @param args args
      */
-    public static void main(String[] args) {
-        int lunarMonth = 3;
-        String eightCharacters = calculationEightCharacters("2017-04-14 11:44", lunarMonth);
-        log.info("eightCharacters : {}", eightCharacters);
-        lunarMonth = 11;
-        eightCharacters = calculationEightCharacters("1990-12-26 11:44", lunarMonth);
-        log.info("eightCharacters : {}", eightCharacters);
+    public static void main(String[] args) throws ParseException {
+        List<String> paramList = Arrays.asList("2017-04-14 11", "1990-12-26 11", "1992-01-20 11");
+        for (String birth : paramList) {
+            Map<String, Map<HeavenlyStem, Earthly>> eightCharacters = calculationEightCharacters(birth);
+            print(birth, eightCharacters);
+        }
+    }
+
+    /**
+     * 打印方法
+     *
+     * @param birth 生日
+     * @param map   八字对象
+     */
+    private static void print(String birth, Map<String, Map<HeavenlyStem, Earthly>> map) throws ParseException {
+        StringBuilder nameBuilder = new StringBuilder();
+        StringBuilder codeBuilder = new StringBuilder();
+        for (Map.Entry<String, Map<HeavenlyStem, Earthly>> entry : map.entrySet()) {
+            codeBuilder.append(entry.getKey());
+            for (Map.Entry<HeavenlyStem, Earthly> heEntry : entry.getValue().entrySet()) {
+                nameBuilder.append(heEntry.getKey().getName()).append(heEntry.getValue().getName());
+                codeBuilder.append(heEntry.getKey().getCode()).append("-").append(heEntry.getValue().getCode());
+            }
+            codeBuilder.append(",");
+            nameBuilder.append(entry.getKey());
+        }
+        Date birthDate = DateUtils.parseDate(birth, DATE_FORMAT_BIRTH);
+        log.info("{}生", DateFormatUtils.format(birthDate, "yyyy年MM月dd日HH时"));
+        log.info("生辰八字:{}, {}", nameBuilder.toString(), codeBuilder.toString());
+        log.info("=========================================================");
     }
 
     /**
      * 计算生辰八字
      *
-     * @param birth      公历生日
-     * @param lunarMonth 生日对应农历月
+     * @param birth 公历生日
      */
-    private static String calculationEightCharacters(String birth, int lunarMonth) {
+    private static Map<String, Map<HeavenlyStem, Earthly>> calculationEightCharacters(String birth) {
         Calendar calendar = Calendar.getInstance();
         try {
-            calendar.setTime(DateUtils.parseDate(birth, "yyyy-MM-dd HH:mm"));
+            calendar.setTime(DateUtils.parseDate(birth, DATE_FORMAT_BIRTH));
         } catch (ParseException e) {
             throw new IllegalArgumentException("birth convert Exception,birth:" + birth, e);
         }
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH) + 1;
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        return calculationEightCharacters(year, month, day, hour, lunarMonth);
+        return calculationEightCharacters(calendar);
     }
 
     /**
      * 计算生辰八字
      *
-     * @param year       公历年
-     * @param month      公历月
-     * @param day        公历日
-     * @param hour       公历小时
-     * @param lunarMonth 农历月
+     * @param birthCal 生日对象
      */
-    private static String calculationEightCharacters(int year, int month, int day, int hour, int lunarMonth) {
-        if (MIN_YEAR > year || MAX_YEAR < year) {
-            throw new IllegalArgumentException("year应在" + MIN_YEAR + "至" + MAX_YEAR + "之间");
-        }
-        HeavenlyStem yearHeavenlyStem = getYearHeavenlyStem(year);
-        Earthly yearEarthly = getYearEarthly(year);
-        HeavenlyStem monthHeavenlyStem = getMonthHeavenlyStem(lunarMonth, yearHeavenlyStem);
-        Earthly monthEarthly = getMonthEarthly(lunarMonth);
+    private static Map<String, Map<HeavenlyStem, Earthly>> calculationEightCharacters(Calendar birthCal) {
+        Calendar lunarCal = DateUtils.LunarDate.solarToLunar(birthCal);
+        int year = birthCal.get(Calendar.YEAR);
+        int month = birthCal.get(Calendar.MONTH) + 1;
+        int day = birthCal.get(Calendar.DAY_OF_MONTH);
+        int hour = birthCal.get(Calendar.HOUR_OF_DAY);
+        int lunarYear = lunarCal.get(Calendar.YEAR);
+        int lunarMonth = lunarCal.get(Calendar.MONTH) + 1;
+        HeavenlyStem yearHeavenlyStem = getYearHeavenlyStem(lunarYear);
         HeavenlyStem dayHeavenlyStem = getDayHeavenlyStem(year, month, day);
-        Earthly dayEarthly = getDayEarthly(year, month, day);
-        HeavenlyStem hourHeavenlyStem = getTimeHeavenlyStem(dayHeavenlyStem);
-        Earthly hourEarthly = getTimeEarthly(hour);
-        return yearHeavenlyStem.getName() + yearEarthly.getName() +
-                monthHeavenlyStem.getName() + monthEarthly.getName() +
-                dayHeavenlyStem.getName() + dayEarthly.getName() +
-                hourHeavenlyStem.getName() + hourEarthly.getName();
+        Map<String, Map<HeavenlyStem, Earthly>> map = Maps.newLinkedHashMap();
+        map.put("年", ImmutableMap.of(yearHeavenlyStem, getYearEarthly(lunarYear)));
+        map.put("月", ImmutableMap.of(getMonthHeavenlyStem(lunarMonth, yearHeavenlyStem), getMonthEarthly(lunarMonth)));
+        map.put("日", ImmutableMap.of(dayHeavenlyStem, getDayEarthly(year, month, day)));
+        map.put("时", ImmutableMap.of(getTimeHeavenlyStem(dayHeavenlyStem), getTimeEarthly(hour)));
+        return map;
     }
 
     /**
      * 获取年-天干
      *
-     * @param year 年
+     * @param lunarYear 农历年
      * @return 年天干
      */
-    private static HeavenlyStem getYearHeavenlyStem(int year) {
-        HeavenlyStem heavenlyStem = HeavenlyStem.getHeavenlyStem(year % 10);
+    private static HeavenlyStem getYearHeavenlyStem(int lunarYear) {
+        int yearRemainder = lunarYear % 10;
+        HeavenlyStem heavenlyStem = HeavenlyStem.getHeavenlyStemByOrdinal(yearRemainder > 3 ? yearRemainder - 3 : yearRemainder + 7);
         if (null == heavenlyStem) {
-            throw new RuntimeException("yearHeavenlyStem is null , year:" + year);
+            throw new RuntimeException("yearHeavenlyStem is null , year:" + lunarYear);
         }
         return heavenlyStem;
     }
@@ -146,13 +167,14 @@ public class EightCharacters {
     /**
      * 获取年-地支
      *
-     * @param year 年
+     * @param lunarYear 农历年
      * @return 年地支
      */
-    private static Earthly getYearEarthly(int year) {
-        Earthly earthly = Earthly.getEarthly(year % 12);
+    private static Earthly getYearEarthly(int lunarYear) {
+        int yearRemainder = lunarYear % 12;
+        Earthly earthly = Earthly.getEarthlyByOrdinal(yearRemainder > 3 ? yearRemainder - 3 : yearRemainder + 9);
         if (null == earthly) {
-            throw new RuntimeException("yearEarthly is null , year:" + year);
+            throw new RuntimeException("yearEarthly is null , year:" + lunarYear);
         }
         return earthly;
     }
@@ -165,7 +187,7 @@ public class EightCharacters {
      * @return 月天干
      */
     private static HeavenlyStem getMonthHeavenlyStem(int lunarMonth, HeavenlyStem yearHeavenlyStem) {
-        HeavenlyStem heavenlyStem = HeavenlyStem.getHeavenlyStem(YEAR_MONTH_HEAVENLY_STEM_MAPPING.get(yearHeavenlyStem.getCode())[lunarMonth - 1]);
+        HeavenlyStem heavenlyStem = HeavenlyStem.getHeavenlyStemByOrdinal(YEAR_MONTH_HEAVENLY_STEM_MAPPING.get(yearHeavenlyStem.getCode())[lunarMonth - 1]);
         if (null == heavenlyStem) {
             throw new RuntimeException("monthHeavenlyStem is null , lunarMonth:" + lunarMonth + ",yearHeavenlyStem:" + yearHeavenlyStem);
         }
@@ -179,7 +201,7 @@ public class EightCharacters {
      * @return 月地支
      */
     private static Earthly getMonthEarthly(int lunarMonth) {
-        Earthly earthly = Earthly.getEarthly((lunarMonth + 5) % 12);
+        Earthly earthly = Earthly.getEarthlyByOrdinal((lunarMonth + 2) % 12);
         if (null == earthly) {
             throw new RuntimeException("monthEarthly is null , lunarMonth:" + lunarMonth);
         }
@@ -189,18 +211,18 @@ public class EightCharacters {
     /**
      * 获取日-天干
      *
-     * @param year  年
+     * @param year  公历年
      * @param month 公历月
      * @param day   公历日
      * @return 日天干
      */
     private static HeavenlyStem getDayHeavenlyStem(int year, int month, int day) {
-        int dayHeavenlyStemBaseCode = ((year % 100 - 1) / 4) * 6 + (((year % 100 - 1) / 4) * 3 + (year % 100 - 1) % 4) * 5 + MONTH_BASE[month - 1] + day + (year > 2000 ? 0 : 15);
-        boolean leapYear = (year % 4 == 0 && year % 100 != 0) || year % 400 == 0;
-        if (leapYear) {
-            dayHeavenlyStemBaseCode += 1;
-        }
-        HeavenlyStem heavenlyStem = HeavenlyStem.getHeavenlyStemByOrdinal((dayHeavenlyStemBaseCode % 60) % 10);
+        year = month < 3 ? year - 1 : year;
+        int c = year / 100;
+        int y = year % 100;
+        int m = month < 3 ? month + 12 : month;
+        int dayHeavenlyStemBaseCode = 4 * c + c / 4 + 5 * y + y / 4 + 3 * (m + 1) / 5 + day - 3;
+        HeavenlyStem heavenlyStem = HeavenlyStem.getHeavenlyStemByOrdinal(dayHeavenlyStemBaseCode % 10);
         if (null == heavenlyStem) {
             throw new RuntimeException("dayHeavenlyStem is null , year:" + year + ",month:" + month + ",day:" + day);
         }
@@ -210,18 +232,18 @@ public class EightCharacters {
     /**
      * 获取日-地支
      *
-     * @param year  年
+     * @param year  公历年
      * @param month 公历月
      * @param day   公历日
      * @return 日地支
      */
     private static Earthly getDayEarthly(int year, int month, int day) {
-        int dayHeavenlyStemBaseCode = ((year % 100 - 1) / 4) * 6 + (((year % 100 - 1) / 4) * 3 + (year % 100 - 1) % 4) * 5 + MONTH_BASE[month - 1] + day + (year > 2000 ? 0 : 15);
-        boolean leapYear = (year % 4 == 0 && year % 100 != 0) || year % 400 == 0;
-        if (leapYear) {
-            dayHeavenlyStemBaseCode += 1;
-        }
-        Earthly earthly = Earthly.getEarthlyByOrdinal((dayHeavenlyStemBaseCode % 60) % 12);
+        year = month < 3 ? year - 1 : year;
+        int c = year > 2000 ? 20 : 19;
+        int y = year % 100;
+        int m = month < 3 ? month + 12 : month;
+        int dayHeavenlyStemBaseCode = 8 * c + c / 4 + 5 * y + y / 4 + 3 * (m + 1) / 5 + day + 7 + (m % 2 == 0 ? 6 : 0);
+        Earthly earthly = Earthly.getEarthlyByOrdinal(dayHeavenlyStemBaseCode % 12);
         if (null == earthly) {
             throw new RuntimeException("dayEarthly is null , year:" + year + ",month:" + month + ",day:" + day);
         }
@@ -310,21 +332,6 @@ public class EightCharacters {
         private final String name;
 
         /**
-         * 根据code得到天干对象
-         *
-         * @param code code
-         * @return 天干对象
-         */
-        public static HeavenlyStem getHeavenlyStem(int code) {
-            for (HeavenlyStem heavenlyStem : HeavenlyStem.values()) {
-                if (code == heavenlyStem.getCode()) {
-                    return heavenlyStem;
-                }
-            }
-            return HeavenlyStem.JIA;
-        }
-
-        /**
          * 根据ordinal得到天干对象
          *
          * @param ordinal ordinal
@@ -400,21 +407,6 @@ public class EightCharacters {
          * 名称
          */
         private final String name;
-
-        /**
-         * 根据code得到地支对象
-         *
-         * @param code code
-         * @return 地支对象
-         */
-        public static Earthly getEarthly(int code) {
-            for (Earthly earthly : Earthly.values()) {
-                if (code == earthly.getCode()) {
-                    return earthly;
-                }
-            }
-            return null;
-        }
 
         /**
          * 根据ordinal得到地支对象
