@@ -1,4 +1,8 @@
-package com.demo.playful.toy;
+package com.demo.playful.toy.utils;
+
+import com.demo.playful.toy.enums.Earthly;
+import com.demo.playful.toy.enums.HeavenlyStem;
+import com.google.common.collect.ImmutableMap;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -24,10 +28,26 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
          * 支持转换的最大农历年份
          */
         public static final int MAX_YEAR = 2099;
+
         /**
-         * 公历每月前的天数
+         * 农历月对应表
+         * key - 农历月数字
+         * value - 农历月名称
          */
-        private static final int[] DAYS_BEFORE_MONTH = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
+        private static final ImmutableMap<Integer, String> LUNAR_MONTH_MAPPING = ImmutableMap.<Integer, String>builder().
+                put(1, "正").put(2, "二").put(3, "三").put(4, "四").put(5, "五").put(6, "六").
+                put(7, "七").put(8, "八").put(9, "九").put(10, "十").put(11, "冬").put(12, "腊").
+                build();
+
+        /**
+         * 日期数字对应表
+         * key - 数字
+         * value - 名称
+         */
+        private static final ImmutableMap<Integer, String> DAY_NUM_MAPPING = ImmutableMap.<Integer, String>builder().
+                put(1, "一").put(2, "二").put(3, "三").put(4, "四").put(5, "五").put(6, "六").
+                put(7, "七").put(8, "八").put(9, "九").put(10, "十").build();
+
         /**
          * 用来表示1900年到2099年间农历年份的相关信息，共24位bit的16进制表示，其中：
          * 1. 前4位表示该年闰哪个月；
@@ -35,7 +55,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
          * 3. 最后7位表示农历年首（正月初一）对应的公历日期。
          * 以2014年的数据0x955ABF为例说明：
          * 1001 0101 0101 1010 1011 1111
-         * 闰九月                                  农历正月初一对应公历1月31号
+         * 闰九月 农历正月初一对应公历1月31号
          */
         private static final int[] LUNAR_INFO = {
                 /*1900*/
@@ -83,119 +103,14 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         };
 
         /**
-         * 将农历日期转换为公历日期
-         *
-         * @param year        农历年份
-         * @param month       农历月
-         * @param monthDay    农历日
-         * @param isLeapMonth 该月是否是闰月
-         * @return 返回农历日期对应的公历日期，year0, month1, day2.
-         */
-        public static int[] lunarToSolar(int year, int month, int monthDay, boolean isLeapMonth) {
-
-            int dayOffset;
-
-            int leapMonth;
-
-            int i;
-
-            if (year < MIN_YEAR || year > MAX_YEAR || month < 1 || month > 12
-                    || monthDay < 1 || monthDay > 30) {
-                throw new IllegalArgumentException(
-                        "Illegal lunar date, must be like that:\n\t" +
-                                "year : 1900~2099\n\t" +
-                                "month : 1~12\n\t" +
-                                "day : 1~30");
-            }
-            dayOffset = (LUNAR_INFO[year - MIN_YEAR] & 0x001F) - 1;
-            if (((LUNAR_INFO[year - MIN_YEAR] & 0x0060) >> 5) == 2) {
-                dayOffset += 31;
-            }
-            for (i = 1; i < month; i++) {
-                if ((LUNAR_INFO[year - MIN_YEAR] & (0x80000 >> (i - 1))) == 0) {
-                    dayOffset += 29;
-                } else {
-                    dayOffset += 30;
-                }
-            }
-            dayOffset += monthDay;
-
-            leapMonth = (LUNAR_INFO[year - MIN_YEAR] & 0xf00000) >> 20;
-
-            // 这一年有闰月
-
-            if (leapMonth != 0) {
-                if (month > leapMonth || (month == leapMonth && isLeapMonth)) {
-
-                    if ((LUNAR_INFO[year - MIN_YEAR] & (0x80000 >> (month - 1))) == 0) {
-                        dayOffset += 29;
-                    } else {
-                        dayOffset += 30;
-                    }
-                }
-            }
-
-            if (dayOffset > 366 || (year % 4 != 0 && dayOffset > 365)) {
-                year += 1;
-
-                if (year % 4 == 1) {
-                    dayOffset -= 366;
-                } else {
-                    dayOffset -= 365;
-                }
-            }
-
-            int[] solarInfo = new int[3];
-            for (i = 1; i < 13; i++) {
-                int iPos = DAYS_BEFORE_MONTH[i];
-
-                if (year % 4 == 0 && i > 2) {
-
-                    iPos += 1;
-                }
-
-                if (year % 4 == 0 && i == 2 && iPos + 1 == dayOffset) {
-
-                    solarInfo[1] = i;
-
-                    solarInfo[2] = dayOffset - 31;
-
-                    break;
-
-                }
-                if (iPos >= dayOffset) {
-                    solarInfo[1] = i;
-                    iPos = DAYS_BEFORE_MONTH[i - 1];
-                    if (year % 4 == 0 && i > 2) {
-                        iPos += 1;
-                    }
-                    if (dayOffset > iPos) {
-                        solarInfo[2] = dayOffset - iPos;
-                    } else if (dayOffset == iPos) {
-                        if (year % 4 == 0 && i == 2) {
-                            solarInfo[2] = DAYS_BEFORE_MONTH[i] - DAYS_BEFORE_MONTH[i - 1] + 1;
-                        } else {
-                            solarInfo[2] = DAYS_BEFORE_MONTH[i] - DAYS_BEFORE_MONTH[i - 1];
-                        }
-                    } else {
-                        solarInfo[2] = dayOffset;
-                    }
-                    break;
-                }
-            }
-            solarInfo[0] = year;
-            return solarInfo;
-        }
-
-        /**
          * 将公历日期转换为农历日期，且标识是否是闰月
          *
-         * @param calendar 生日对象
+         * @param birthDate 生日对象
          * @return 返回公历日期对应的农历日期
          */
-        public static Calendar solarToLunar(Calendar calendar) {
+        public static Calendar solarToLunar(Date birthDate) {
             Date baseDate = new GregorianCalendar(1900, Calendar.JANUARY, 31).getTime();
-            int offset = (int) ((calendar.getTimeInMillis() - baseDate.getTime()) / 86400000L);
+            int offset = (int) ((birthDate.getTime() - baseDate.getTime()) / 86400000L);
             // 用offset减去每农历年的天数计算当天是农历第几天
             // iYear最终结果是农历的年份, offset是当年的第几天
             int iYear, daysOfYear = 0;
@@ -276,6 +191,27 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
          */
         private static int leapMonth(int year) {
             return ((LUNAR_INFO[year - MIN_YEAR] & 0xF00000)) >> 20;
+        }
+
+        /**
+         * 农历日期toString
+         *
+         * @param lunarCalendar 农历日期
+         * @return toString
+         */
+        public static String lunarDateToString(Calendar lunarCalendar) {
+            StringBuilder builder = new StringBuilder();
+            HeavenlyStem yearHeavenlyStem = HeavenlyStem.getYearHeavenlyStem(lunarCalendar.get(Calendar.YEAR));
+            Earthly yearEarthly = Earthly.getYearEarthly(lunarCalendar.get(Calendar.YEAR));
+            builder.append(yearHeavenlyStem.getName()).append(yearEarthly.getName()).append("年");
+            builder.append(LUNAR_MONTH_MAPPING.get(lunarCalendar.get(Calendar.MONTH) + 1)).append("月");
+            int lunarDay = lunarCalendar.get(Calendar.DAY_OF_MONTH);
+            if (lunarDay > 10) {
+                builder.append("十").append(DAY_NUM_MAPPING.get(lunarDay % 10));
+            } else {
+                builder.append("初").append(DAY_NUM_MAPPING.get(lunarDay));
+            }
+            return builder.toString();
         }
     }
 }
