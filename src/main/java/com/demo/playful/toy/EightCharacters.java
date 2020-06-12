@@ -1,5 +1,6 @@
 package com.demo.playful.toy;
 
+import com.alibaba.fastjson.JSONObject;
 import com.demo.playful.toy.enums.DateEnum;
 import com.demo.playful.toy.enums.Earthly;
 import com.demo.playful.toy.enums.HeavenlyStem;
@@ -35,6 +36,7 @@ public class EightCharacters {
         List<String> paramList = Arrays.asList("2017-04-14 11", "1990-12-26 11", "1992-01-20 11");
         for (String birth : paramList) {
             Map<DateEnum, Map<HeavenlyStem, Earthly>> eightCharacters = calculationEightCharacters(birth);
+            log.info(JSONObject.toJSONString(eightCharacters));
             print(birth, eightCharacters);
         }
     }
