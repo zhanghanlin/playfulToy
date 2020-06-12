@@ -35,16 +35,6 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     }
 
     /**
-     * 日期格式化
-     */
-    public interface Format {
-        /**
-         * yyyy-MM-dd HH
-         */
-        String Y_M_D_H = "yyyy-MM-dd HH";
-    }
-
-    /**
      * 公历日期服务
      */
     public static class LunarDate {

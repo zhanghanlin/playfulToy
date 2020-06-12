@@ -33,7 +33,7 @@ public class CalculationEightCharacters {
     public static void main(String[] args) {
         List<String> paramList = Arrays.asList("2017-04-14 11", "1990-12-26 11", "1992-01-20 11");
         for (String birth : paramList) {
-            Calendar birthCal = DateUtils.parseCalendar(birth, DateUtils.Format.Y_M_D_H);
+            Calendar birthCal = DateUtils.parseCalendar(birth, "yyyy-MM-dd HH");
             EightCharactersDto eightCharacters = calculationEightCharacters(birthCal);
             log.info("公历生日 : {}", DateFormatUtils.format(eightCharacters.getDate(), "yyyy年MM月dd日 HH时"));
             log.info("农历生日 : {}", DateUtils.LunarDate.lunarDateToString(eightCharacters.getLunarDate()));
