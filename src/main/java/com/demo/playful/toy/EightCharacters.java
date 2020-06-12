@@ -82,11 +82,11 @@ public class EightCharacters {
     private static Map<DateEnum, Map<HeavenlyStem, Earthly>> calculationEightCharacters(Calendar birthCal) {
         Calendar lunarCal = DateUtils.LunarDate.solarToLunar(birthCal);
         int year = birthCal.get(Calendar.YEAR);
-        int month = birthCal.get(Calendar.MONTH) + 1;
+        int month = birthCal.get(Calendar.MONTH);
         int day = birthCal.get(Calendar.DAY_OF_MONTH);
         int hour = birthCal.get(Calendar.HOUR_OF_DAY);
         int lunarYear = lunarCal.get(Calendar.YEAR);
-        int lunarMonth = lunarCal.get(Calendar.MONTH) + 1;
+        int lunarMonth = lunarCal.get(Calendar.MONTH);
         HeavenlyStem yearHeavenlyStem = HeavenlyStem.getYearHeavenlyStem(lunarYear);
         HeavenlyStem dayHeavenlyStem = HeavenlyStem.getDayHeavenlyStem(year, month, day);
         Map<DateEnum, Map<HeavenlyStem, Earthly>> map = Maps.newLinkedHashMap();

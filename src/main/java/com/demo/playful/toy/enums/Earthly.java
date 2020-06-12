@@ -91,7 +91,7 @@ public enum Earthly {
             put(19, Earthly.XU).put(20, Earthly.XU).
             put(21, Earthly.HAI).put(22, Earthly.HAI).
             build();
-    
+
     /**
      * 根据ordinal得到地支对象
      *
@@ -129,7 +129,7 @@ public enum Earthly {
      * @return 月地支
      */
     public static Earthly getMonthEarthly(int lunarMonth) {
-        Earthly earthly = getEarthlyByOrdinal((lunarMonth + 2) % 12);
+        Earthly earthly = getEarthlyByOrdinal((lunarMonth + 3) % 12);
         if (null == earthly) {
             throw new RuntimeException("monthEarthly is null , lunarMonth:" + lunarMonth);
         }
@@ -148,7 +148,7 @@ public enum Earthly {
         year = month < 3 ? year - 1 : year;
         int c = year > 2000 ? 20 : 19;
         int y = year % 100;
-        int m = month < 3 ? month + 12 : month;
+        int m = month < 2 ? month + 13 : month + 1;
         int dayHeavenlyStemBaseCode = 8 * c + c / 4 + 5 * y + y / 4 + 3 * (m + 1) / 5 + day + 7 + (m % 2 == 0 ? 6 : 0);
         Earthly earthly = getEarthlyByOrdinal(dayHeavenlyStemBaseCode % 12);
         if (null == earthly) {

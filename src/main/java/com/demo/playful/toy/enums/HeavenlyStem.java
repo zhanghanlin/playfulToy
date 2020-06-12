@@ -120,7 +120,7 @@ public enum HeavenlyStem {
      * @return 月天干
      */
     public static HeavenlyStem getMonthHeavenlyStem(int lunarMonth, HeavenlyStem yearHeavenlyStem) {
-        HeavenlyStem heavenlyStem = getHeavenlyStemByOrdinal(YEAR_MONTH_HEAVENLY_STEM_MAPPING.get(yearHeavenlyStem.getCode())[lunarMonth - 1]);
+        HeavenlyStem heavenlyStem = getHeavenlyStemByOrdinal(YEAR_MONTH_HEAVENLY_STEM_MAPPING.get(yearHeavenlyStem.getCode())[lunarMonth]);
         if (null == heavenlyStem) {
             throw new RuntimeException("monthHeavenlyStem is null , lunarMonth:" + lunarMonth + ",yearHeavenlyStem:" + yearHeavenlyStem);
         }
@@ -139,7 +139,7 @@ public enum HeavenlyStem {
         year = month < 3 ? year - 1 : year;
         int c = year / 100;
         int y = year % 100;
-        int m = month < 3 ? month + 12 : month;
+        int m = month < 2 ? month + 13 : month + 1;
         int dayHeavenlyStemBaseCode = 4 * c + c / 4 + 5 * y + y / 4 + 3 * (m + 1) / 5 + day - 3;
         HeavenlyStem heavenlyStem = getHeavenlyStemByOrdinal(dayHeavenlyStemBaseCode % 10);
         if (null == heavenlyStem) {
