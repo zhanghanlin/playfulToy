@@ -1,5 +1,6 @@
 package com.demo.playful.toy;
 
+import com.demo.playful.toy.enums.DateEnum;
 import com.demo.playful.toy.enums.Earthly;
 import com.demo.playful.toy.enums.HeavenlyStem;
 import com.demo.playful.toy.utils.DateUtils;
@@ -33,7 +34,7 @@ public class EightCharacters {
     public static void main(String[] args) throws ParseException {
         List<String> paramList = Arrays.asList("2017-04-14 11", "1990-12-26 11", "1992-01-20 11");
         for (String birth : paramList) {
-            Map<String, Map<HeavenlyStem, Earthly>> eightCharacters = calculationEightCharacters(birth);
+            Map<DateEnum, Map<HeavenlyStem, Earthly>> eightCharacters = calculationEightCharacters(birth);
             print(birth, eightCharacters);
         }
     }
@@ -44,10 +45,10 @@ public class EightCharacters {
      * @param birth 生日
      * @param map   八字对象
      */
-    private static void print(String birth, Map<String, Map<HeavenlyStem, Earthly>> map) throws ParseException {
+    private static void print(String birth, Map<DateEnum, Map<HeavenlyStem, Earthly>> map) throws ParseException {
         StringBuilder nameBuilder = new StringBuilder();
         StringBuilder codeBuilder = new StringBuilder();
-        for (Map.Entry<String, Map<HeavenlyStem, Earthly>> entry : map.entrySet()) {
+        for (Map.Entry<DateEnum, Map<HeavenlyStem, Earthly>> entry : map.entrySet()) {
             for (Map.Entry<HeavenlyStem, Earthly> heEntry : entry.getValue().entrySet()) {
                 nameBuilder.append(heEntry.getKey().getName()).append(heEntry.getValue().getName());
                 codeBuilder.append(heEntry.getKey().getCode()).append("-").append(heEntry.getValue().getCode());
@@ -67,7 +68,7 @@ public class EightCharacters {
      *
      * @param birth 公历生日
      */
-    private static Map<String, Map<HeavenlyStem, Earthly>> calculationEightCharacters(String birth) {
+    public static Map<DateEnum, Map<HeavenlyStem, Earthly>> calculationEightCharacters(String birth) {
         try {
             return calculationEightCharacters(DateUtils.parseDate(birth, DATE_FORMAT_BIRTH));
         } catch (ParseException e) {
@@ -80,7 +81,7 @@ public class EightCharacters {
      *
      * @param birthDate 生日对象
      */
-    private static Map<String, Map<HeavenlyStem, Earthly>> calculationEightCharacters(Date birthDate) {
+    private static Map<DateEnum, Map<HeavenlyStem, Earthly>> calculationEightCharacters(Date birthDate) {
         Calendar birthCal = Calendar.getInstance();
         birthCal.setTime(birthDate);
         Calendar lunarCal = DateUtils.LunarDate.solarToLunar(birthDate);
@@ -92,11 +93,11 @@ public class EightCharacters {
         int lunarMonth = lunarCal.get(Calendar.MONTH) + 1;
         HeavenlyStem yearHeavenlyStem = HeavenlyStem.getYearHeavenlyStem(lunarYear);
         HeavenlyStem dayHeavenlyStem = HeavenlyStem.getDayHeavenlyStem(year, month, day);
-        Map<String, Map<HeavenlyStem, Earthly>> map = Maps.newLinkedHashMap();
-        map.put("年", ImmutableMap.of(yearHeavenlyStem, Earthly.getYearEarthly(lunarYear)));
-        map.put("月", ImmutableMap.of(HeavenlyStem.getMonthHeavenlyStem(lunarMonth, yearHeavenlyStem), Earthly.getMonthEarthly(lunarMonth)));
-        map.put("日", ImmutableMap.of(dayHeavenlyStem, Earthly.getDayEarthly(year, month, day)));
-        map.put("时", ImmutableMap.of(HeavenlyStem.getTimeHeavenlyStem(dayHeavenlyStem), Earthly.getTimeEarthly(hour)));
+        Map<DateEnum, Map<HeavenlyStem, Earthly>> map = Maps.newLinkedHashMap();
+        map.put(DateEnum.YEAR, ImmutableMap.of(yearHeavenlyStem, Earthly.getYearEarthly(lunarYear)));
+        map.put(DateEnum.MONTH, ImmutableMap.of(HeavenlyStem.getMonthHeavenlyStem(lunarMonth, yearHeavenlyStem), Earthly.getMonthEarthly(lunarMonth)));
+        map.put(DateEnum.DAY, ImmutableMap.of(dayHeavenlyStem, Earthly.getDayEarthly(year, month, day)));
+        map.put(DateEnum.HOUR, ImmutableMap.of(HeavenlyStem.getTimeHeavenlyStem(dayHeavenlyStem), Earthly.getTimeEarthly(hour)));
         return map;
     }
 }
