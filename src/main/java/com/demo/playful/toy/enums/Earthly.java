@@ -8,7 +8,7 @@ import lombok.Getter;
  * Earthly
  * 12地支
  *
- * @author zhanghanlin6
+ * @author 张涵林
  * @date 2020/6/11
  */
 @Getter

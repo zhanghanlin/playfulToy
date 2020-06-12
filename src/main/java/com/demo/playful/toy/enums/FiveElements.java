@@ -7,7 +7,7 @@ import lombok.Getter;
  * FiveElementsEnum
  * 五行
  *
- * @author zhanghanlin6
+ * @author 张涵林
  * @date 2020/6/12
  */
 @Getter

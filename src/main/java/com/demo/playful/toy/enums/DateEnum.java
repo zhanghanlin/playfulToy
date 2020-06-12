@@ -7,7 +7,7 @@ import lombok.Getter;
  * DateEnum
  * 时间枚举
  *
- * @author zhanghanlin6
+ * @author 张涵林
  * @date 2020/6/12
  */
 @Getter
