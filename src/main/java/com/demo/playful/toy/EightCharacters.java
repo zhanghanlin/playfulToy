@@ -48,17 +48,16 @@ public class EightCharacters {
         StringBuilder nameBuilder = new StringBuilder();
         StringBuilder codeBuilder = new StringBuilder();
         for (Map.Entry<String, Map<HeavenlyStem, Earthly>> entry : map.entrySet()) {
-            codeBuilder.append(entry.getKey());
             for (Map.Entry<HeavenlyStem, Earthly> heEntry : entry.getValue().entrySet()) {
                 nameBuilder.append(heEntry.getKey().getName()).append(heEntry.getValue().getName());
                 codeBuilder.append(heEntry.getKey().getCode()).append("-").append(heEntry.getValue().getCode());
             }
-            codeBuilder.append(",");
-            nameBuilder.append(entry.getKey());
+            codeBuilder.append(" ");
+            nameBuilder.append(" ");
         }
         Date birthDate = DateUtils.parseDate(birth, DATE_FORMAT_BIRTH);
         Calendar lunarCal = DateUtils.LunarDate.solarToLunar(birthDate);
-        log.info("{}生,{}", DateFormatUtils.format(birthDate, "yyyy年MM月dd日HH时"), DateUtils.LunarDate.lunarDateToString(lunarCal));
+        log.info("公历生日:{},农历生日:{}", DateFormatUtils.format(birthDate, "yyyy年MM月dd日HH时"), DateUtils.LunarDate.lunarDateToString(lunarCal));
         log.info("生辰八字:{}, {}", nameBuilder.toString(), codeBuilder.toString());
         log.info("=========================================================");
     }

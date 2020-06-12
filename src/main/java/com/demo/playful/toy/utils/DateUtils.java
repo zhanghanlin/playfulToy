@@ -46,7 +46,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
          */
         private static final ImmutableMap<Integer, String> DAY_NUM_MAPPING = ImmutableMap.<Integer, String>builder().
                 put(1, "一").put(2, "二").put(3, "三").put(4, "四").put(5, "五").put(6, "六").
-                put(7, "七").put(8, "八").put(9, "九").put(10, "十").build();
+                put(7, "七").put(8, "八").put(9, "九").put(10, "十").put(0, "十").build();
 
         /**
          * 用来表示1900年到2099年间农历年份的相关信息，共24位bit的16进制表示，其中：
@@ -206,11 +206,8 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
             builder.append(yearHeavenlyStem.getName()).append(yearEarthly.getName()).append("年");
             builder.append(LUNAR_MONTH_MAPPING.get(lunarCalendar.get(Calendar.MONTH) + 1)).append("月");
             int lunarDay = lunarCalendar.get(Calendar.DAY_OF_MONTH);
-            if (lunarDay > 10) {
-                builder.append("十").append(DAY_NUM_MAPPING.get(lunarDay % 10));
-            } else {
-                builder.append("初").append(DAY_NUM_MAPPING.get(lunarDay));
-            }
+            String tenBit = lunarDay > 10 ? (lunarDay >= 20 ? (lunarDay >= 30 ? "三" : "廿") : "十") : "初";
+            builder.append(tenBit).append(DAY_NUM_MAPPING.get(lunarDay % 10));
             return builder.toString();
         }
     }
