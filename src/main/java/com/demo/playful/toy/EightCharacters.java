@@ -1,8 +1,8 @@
 package com.demo.playful.toy;
 
-import com.alibaba.fastjson.JSONObject;
 import com.demo.playful.toy.enums.DateEnum;
 import com.demo.playful.toy.enums.Earthly;
+import com.demo.playful.toy.enums.FiveElements;
 import com.demo.playful.toy.enums.HeavenlyStem;
 import com.demo.playful.toy.utils.DateUtils;
 import com.google.common.collect.ImmutableMap;
@@ -36,7 +36,6 @@ public class EightCharacters {
         List<String> paramList = Arrays.asList("2017-04-14 11", "1990-12-26 11", "1992-01-20 11");
         for (String birth : paramList) {
             Map<DateEnum, Map<HeavenlyStem, Earthly>> eightCharacters = calculationEightCharacters(birth);
-            log.info(JSONObject.toJSONString(eightCharacters));
             print(birth, eightCharacters);
         }
     }
@@ -50,18 +49,28 @@ public class EightCharacters {
     private static void print(String birth, Map<DateEnum, Map<HeavenlyStem, Earthly>> map) throws ParseException {
         StringBuilder nameBuilder = new StringBuilder();
         StringBuilder codeBuilder = new StringBuilder();
+        Map<FiveElements, Integer> fiveCountMap = Maps.newTreeMap();
         for (Map.Entry<DateEnum, Map<HeavenlyStem, Earthly>> entry : map.entrySet()) {
             for (Map.Entry<HeavenlyStem, Earthly> heEntry : entry.getValue().entrySet()) {
                 nameBuilder.append(heEntry.getKey().getName()).append(heEntry.getValue().getName());
                 codeBuilder.append(heEntry.getKey().getCode()).append("-").append(heEntry.getValue().getCode());
+                FiveElements fiveElementsH = FiveElements.getFiveElementsByHeavenlyStem(heEntry.getKey());
+                FiveElements fiveElementsE = FiveElements.getFiveElementsByEarthly(heEntry.getValue());
+                fiveCountMap.put(fiveElementsH, fiveCountMap.containsKey(fiveElementsH) ? fiveCountMap.get(fiveElementsH) + 1 : 1);
+                fiveCountMap.put(fiveElementsE, fiveCountMap.containsKey(fiveElementsE) ? fiveCountMap.get(fiveElementsE) + 1 : 1);
             }
             codeBuilder.append(" ");
             nameBuilder.append(" ");
+        }
+        StringBuilder fiveBuilder = new StringBuilder();
+        for (Map.Entry<FiveElements, Integer> fiveEntry : fiveCountMap.entrySet()) {
+            fiveBuilder.append(fiveEntry.getKey().getName()).append(fiveEntry.getValue()).append(" ");
         }
         Date birthDate = DateUtils.parseDate(birth, DATE_FORMAT_BIRTH);
         Calendar lunarCal = DateUtils.LunarDate.solarToLunar(birthDate);
         log.info("公历生日:{},农历生日:{}", DateFormatUtils.format(birthDate, "yyyy年MM月dd日HH时"), DateUtils.LunarDate.lunarDateToString(lunarCal));
         log.info("生辰八字:{}, {}", nameBuilder.toString(), codeBuilder.toString());
+        log.info("五行:{}", fiveBuilder.toString());
         log.info("=========================================================");
     }
 
