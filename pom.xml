@@ -13,6 +13,7 @@
         <version.commons-lang3>3.9</version.commons-lang3>
         <version.lombok>1.18.12</version.lombok>
         <version.logback>1.2.3</version.logback>
+        <version.guava>22.0</version.guava>
     </properties>
 
     <dependencies>
@@ -40,7 +41,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>22.0</version>
+            <version>${version.guava}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
