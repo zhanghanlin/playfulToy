@@ -154,7 +154,7 @@ public enum HeavenlyStem {
      * @param dayHeavenlyStem 日天干
      * @return 时辰天干
      */
-    public static HeavenlyStem getTimeHeavenlyStem(HeavenlyStem dayHeavenlyStem) {
+    public static HeavenlyStem getHourHeavenlyStem(HeavenlyStem dayHeavenlyStem) {
         HeavenlyStem heavenlyStem = getHeavenlyStemByOrdinal(dayHeavenlyStem.getCode() * 2 - 1);
         if (null == heavenlyStem) {
             throw new RuntimeException("timeHeavenlyStem is null , dayHeavenlyStem:" + dayHeavenlyStem);

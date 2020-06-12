@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * FiveElementsEnum
+ * FiveElements
  * 五行
  *
  * @author 张涵林
