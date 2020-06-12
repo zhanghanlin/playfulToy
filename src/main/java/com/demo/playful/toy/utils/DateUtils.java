@@ -56,15 +56,14 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
          * 支持转换的最大农历年份
          */
         public static final int MAX_YEAR = 2099;
-
         /**
          * 农历月对应表
          * key - 农历月数字
          * value - 农历月名称
          */
         private static final ImmutableMap<Integer, String> LUNAR_MONTH_MAPPING = ImmutableMap.<Integer, String>builder().
-                put(1, "正").put(2, "二").put(3, "三").put(4, "四").put(5, "五").put(6, "六").
-                put(7, "七").put(8, "八").put(9, "九").put(10, "十").put(11, "冬").put(12, "腊").
+                put(0, "正").put(1, "二").put(2, "三").put(3, "四").put(4, "五").put(5, "六").
+                put(6, "七").put(7, "八").put(8, "九").put(9, "十").put(10, "冬").put(11, "腊").
                 build();
 
         /**
@@ -78,9 +77,9 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 
         /**
          * 用来表示1900年到2099年间农历年份的相关信息，共24位bit的16进制表示，其中：
-         * 1. 前4位表示该年闰哪个月；
-         * 2. 5-17位表示农历年份13个月的大小月分布，0表示小，1表示大；
-         * 3. 最后7位表示农历年首（正月初一）对应的公历日期。
+         * 前4位表示该年闰哪个月；
+         * 5-17位表示农历年份13个月的大小月分布，0表示小，1表示大；
+         * 最后7位表示农历年首（正月初一）对应的公历日期。
          * 以2014年的数据0x955ABF为例说明：
          * 1001 0101 0101 1010 1011 1111
          * 闰九月 农历正月初一对应公历1月31号
@@ -232,7 +231,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
             Earthly yearEarthly = Earthly.getYearEarthly(lunarCalendar.get(Calendar.YEAR));
             Earthly hourEarthly = Earthly.getHourEarthly(lunarCalendar.get(Calendar.HOUR_OF_DAY));
             builder.append(yearHeavenlyStem.getName()).append(yearEarthly.getName()).append("年");
-            builder.append(LUNAR_MONTH_MAPPING.get(lunarCalendar.get(Calendar.MONTH) + 1)).append("月");
+            builder.append(LUNAR_MONTH_MAPPING.get(lunarCalendar.get(Calendar.MONTH))).append("月");
             int lunarDay = lunarCalendar.get(Calendar.DAY_OF_MONTH);
             String tenBit = lunarDay > 10 ? (lunarDay >= 20 ? (lunarDay >= 30 ? "三" : "廿") : "十") : "初";
             builder.append(tenBit).append(DAY_NUM_MAPPING.get(lunarDay % 10));
