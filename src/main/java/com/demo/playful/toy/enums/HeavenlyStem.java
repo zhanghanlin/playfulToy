@@ -65,22 +65,6 @@ public enum HeavenlyStem {
     private final String name;
 
     /**
-     * 根据ordinal得到天干对象
-     *
-     * @param ordinal ordinal
-     * @return 天干对象
-     */
-    public static HeavenlyStem getHeavenlyStemByOrdinal(int ordinal) {
-        for (HeavenlyStem heavenlyStem : HeavenlyStem.values()) {
-            if (ordinal == heavenlyStem.ordinal() + 1) {
-                return heavenlyStem;
-            }
-        }
-        return HeavenlyStem.JIA;
-    }
-
-
-    /**
      * 年-月天干对应表
      * key-年天干码
      * value-月天干对应的索引,数组索引表示农历月(下表从0开始,即0表示1月)
@@ -97,6 +81,21 @@ public enum HeavenlyStem {
             put(0, new Integer[]{5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6}).
             put(5, new Integer[]{5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6}).
             build();
+
+    /**
+     * 根据ordinal得到天干对象
+     *
+     * @param ordinal ordinal
+     * @return 天干对象
+     */
+    public static HeavenlyStem getHeavenlyStemByOrdinal(int ordinal) {
+        for (HeavenlyStem heavenlyStem : HeavenlyStem.values()) {
+            if (ordinal == heavenlyStem.ordinal() + 1) {
+                return heavenlyStem;
+            }
+        }
+        return HeavenlyStem.JIA;
+    }
 
     /**
      * 获取年-天干

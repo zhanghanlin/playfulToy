@@ -73,21 +73,6 @@ public enum Earthly {
     private final String name;
 
     /**
-     * 根据ordinal得到地支对象
-     *
-     * @param ordinal ordinal
-     * @return 地支对象
-     */
-    public static Earthly getEarthlyByOrdinal(int ordinal) {
-        for (Earthly earthly : Earthly.values()) {
-            if (ordinal == earthly.ordinal() + 1) {
-                return earthly;
-            }
-        }
-        return null;
-    }
-
-    /**
      * 时辰对应表
      * key - 小时数字
      * value - 小时对应的时间地支
@@ -106,6 +91,21 @@ public enum Earthly {
             put(19, Earthly.XU).put(20, Earthly.XU).
             put(21, Earthly.HAI).put(22, Earthly.HAI).
             build();
+    
+    /**
+     * 根据ordinal得到地支对象
+     *
+     * @param ordinal ordinal
+     * @return 地支对象
+     */
+    public static Earthly getEarthlyByOrdinal(int ordinal) {
+        for (Earthly earthly : Earthly.values()) {
+            if (ordinal == earthly.ordinal() + 1) {
+                return earthly;
+            }
+        }
+        return null;
+    }
 
     /**
      * 获取年-地支
