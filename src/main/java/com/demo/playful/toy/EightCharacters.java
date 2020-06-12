@@ -10,8 +10,10 @@ import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
-import java.text.ParseException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
 
 /**
  * EightCharacters
@@ -22,31 +24,28 @@ import java.util.*;
  */
 @Slf4j
 public class EightCharacters {
-    /**
-     * 日期格式化-生日
-     */
-    private static final String DATE_FORMAT_BIRTH = "yyyy-MM-dd HH";
 
     /**
      * main函数
      *
      * @param args args
      */
-    public static void main(String[] args) throws ParseException {
+    public static void main(String[] args) {
         List<String> paramList = Arrays.asList("2017-04-14 11", "1990-12-26 11", "1992-01-20 11");
         for (String birth : paramList) {
-            Map<DateEnum, Map<HeavenlyStem, Earthly>> eightCharacters = calculationEightCharacters(birth);
-            print(birth, eightCharacters);
+            Calendar birthCal = DateUtils.parseCalendar(birth, DateUtils.Format.Y_M_D_H);
+            Map<DateEnum, Map<HeavenlyStem, Earthly>> eightCharacters = calculationEightCharacters(birthCal);
+            print(birthCal, eightCharacters);
         }
     }
 
     /**
      * 打印方法
      *
-     * @param birth 生日
-     * @param map   八字对象
+     * @param birthCal 生日
+     * @param map      八字对象
      */
-    private static void print(String birth, Map<DateEnum, Map<HeavenlyStem, Earthly>> map) throws ParseException {
+    private static void print(Calendar birthCal, Map<DateEnum, Map<HeavenlyStem, Earthly>> map) {
         StringBuilder nameBuilder = new StringBuilder();
         StringBuilder codeBuilder = new StringBuilder();
         Map<FiveElements, Integer> fiveCountMap = Maps.newTreeMap();
@@ -66,9 +65,9 @@ public class EightCharacters {
         for (Map.Entry<FiveElements, Integer> fiveEntry : fiveCountMap.entrySet()) {
             fiveBuilder.append(fiveEntry.getKey().getName()).append(fiveEntry.getValue()).append(" ");
         }
-        Date birthDate = DateUtils.parseDate(birth, DATE_FORMAT_BIRTH);
-        Calendar lunarCal = DateUtils.LunarDate.solarToLunar(birthDate);
-        log.info("公历生日:{},农历生日:{}", DateFormatUtils.format(birthDate, "yyyy年MM月dd日HH时"), DateUtils.LunarDate.lunarDateToString(lunarCal));
+        Calendar lunarCal = DateUtils.LunarDate.solarToLunar(birthCal);
+        log.info("公历生日:{}", DateFormatUtils.format(birthCal, "yyyy年MM月dd日 HH时"));
+        log.info("农历生日:{}", DateUtils.LunarDate.lunarDateToString(lunarCal));
         log.info("生辰八字:{}, {}", nameBuilder.toString(), codeBuilder.toString());
         log.info("五行:{}", fiveBuilder.toString());
         log.info("=========================================================");
@@ -77,25 +76,10 @@ public class EightCharacters {
     /**
      * 计算生辰八字
      *
-     * @param birth 公历生日
+     * @param birthCal 生日对象
      */
-    public static Map<DateEnum, Map<HeavenlyStem, Earthly>> calculationEightCharacters(String birth) {
-        try {
-            return calculationEightCharacters(DateUtils.parseDate(birth, DATE_FORMAT_BIRTH));
-        } catch (ParseException e) {
-            throw new IllegalArgumentException("birth convert Exception,birth:" + birth, e);
-        }
-    }
-
-    /**
-     * 计算生辰八字
-     *
-     * @param birthDate 生日对象
-     */
-    private static Map<DateEnum, Map<HeavenlyStem, Earthly>> calculationEightCharacters(Date birthDate) {
-        Calendar birthCal = Calendar.getInstance();
-        birthCal.setTime(birthDate);
-        Calendar lunarCal = DateUtils.LunarDate.solarToLunar(birthDate);
+    private static Map<DateEnum, Map<HeavenlyStem, Earthly>> calculationEightCharacters(Calendar birthCal) {
+        Calendar lunarCal = DateUtils.LunarDate.solarToLunar(birthCal);
         int year = birthCal.get(Calendar.YEAR);
         int month = birthCal.get(Calendar.MONTH) + 1;
         int day = birthCal.get(Calendar.DAY_OF_MONTH);
@@ -108,7 +92,7 @@ public class EightCharacters {
         map.put(DateEnum.YEAR, ImmutableMap.of(yearHeavenlyStem, Earthly.getYearEarthly(lunarYear)));
         map.put(DateEnum.MONTH, ImmutableMap.of(HeavenlyStem.getMonthHeavenlyStem(lunarMonth, yearHeavenlyStem), Earthly.getMonthEarthly(lunarMonth)));
         map.put(DateEnum.DAY, ImmutableMap.of(dayHeavenlyStem, Earthly.getDayEarthly(year, month, day)));
-        map.put(DateEnum.HOUR, ImmutableMap.of(HeavenlyStem.getTimeHeavenlyStem(dayHeavenlyStem), Earthly.getTimeEarthly(hour)));
+        map.put(DateEnum.HOUR, ImmutableMap.of(HeavenlyStem.getTimeHeavenlyStem(dayHeavenlyStem), Earthly.getHourEarthly(hour)));
         return map;
     }
 }

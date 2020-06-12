@@ -4,6 +4,7 @@ import com.demo.playful.toy.enums.Earthly;
 import com.demo.playful.toy.enums.HeavenlyStem;
 import com.google.common.collect.ImmutableMap;
 
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -15,6 +16,33 @@ import java.util.GregorianCalendar;
  * @date 2020/6/9
  */
 public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
+
+    /**
+     * 字符串日期转换为Calendar
+     *
+     * @param dateStr 日期字符串
+     * @param format  日期格式
+     * @return Calendar日期对象
+     */
+    public static Calendar parseCalendar(String dateStr, String format) {
+        Calendar calendar = Calendar.getInstance();
+        try {
+            calendar.setTime(DateUtils.parseDate(dateStr, format));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return calendar;
+    }
+
+    /**
+     * 日期格式化
+     */
+    public interface Format {
+        /**
+         * yyyy-MM-dd HH
+         */
+        String Y_M_D_H = "yyyy-MM-dd HH";
+    }
 
     /**
      * 公历日期服务
@@ -105,12 +133,12 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         /**
          * 将公历日期转换为农历日期，且标识是否是闰月
          *
-         * @param birthDate 生日对象
+         * @param birthCal 生日对象
          * @return 返回公历日期对应的农历日期
          */
-        public static Calendar solarToLunar(Date birthDate) {
+        public static Calendar solarToLunar(Calendar birthCal) {
             Date baseDate = new GregorianCalendar(1900, Calendar.JANUARY, 31).getTime();
-            int offset = (int) ((birthDate.getTime() - baseDate.getTime()) / 86400000L);
+            int offset = (int) ((birthCal.getTimeInMillis() - baseDate.getTime()) / 86400000L);
             // 用offset减去每农历年的天数计算当天是农历第几天
             // iYear最终结果是农历的年份, offset是当年的第几天
             int iYear, daysOfYear = 0;
@@ -143,8 +171,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
             lunarCalendar.set(Calendar.YEAR, iYear);
             lunarCalendar.set(Calendar.MONTH, iMonth - 1);
             lunarCalendar.set(Calendar.DAY_OF_MONTH, offset + 1);
-            Date lunarDate = DateUtils.truncate(lunarCalendar.getTime(), Calendar.HOUR_OF_DAY);
-            lunarCalendar.setTime(lunarDate);
+            lunarCalendar.set(Calendar.HOUR_OF_DAY, birthCal.get(Calendar.HOUR_OF_DAY));
             return lunarCalendar;
         }
 
@@ -203,11 +230,13 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
             StringBuilder builder = new StringBuilder();
             HeavenlyStem yearHeavenlyStem = HeavenlyStem.getYearHeavenlyStem(lunarCalendar.get(Calendar.YEAR));
             Earthly yearEarthly = Earthly.getYearEarthly(lunarCalendar.get(Calendar.YEAR));
+            Earthly hourEarthly = Earthly.getHourEarthly(lunarCalendar.get(Calendar.HOUR_OF_DAY));
             builder.append(yearHeavenlyStem.getName()).append(yearEarthly.getName()).append("年");
             builder.append(LUNAR_MONTH_MAPPING.get(lunarCalendar.get(Calendar.MONTH) + 1)).append("月");
             int lunarDay = lunarCalendar.get(Calendar.DAY_OF_MONTH);
             String tenBit = lunarDay > 10 ? (lunarDay >= 20 ? (lunarDay >= 30 ? "三" : "廿") : "十") : "初";
             builder.append(tenBit).append(DAY_NUM_MAPPING.get(lunarDay % 10));
+            builder.append(" ").append(hourEarthly.getName()).append("时");
             return builder.toString();
         }
     }

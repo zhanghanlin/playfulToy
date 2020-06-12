@@ -92,7 +92,7 @@ public enum Earthly {
      * key - 小时数字
      * value - 小时对应的时间地支
      */
-    private static final ImmutableMap<Integer, Earthly> TIME_EARTHLY_MAPPING = ImmutableMap.<Integer, Earthly>builder().
+    private static final ImmutableMap<Integer, Earthly> HOUR_EARTHLY_MAPPING = ImmutableMap.<Integer, Earthly>builder().
             put(23, Earthly.ZI).put(0, Earthly.ZI).
             put(1, Earthly.CHOU).put(2, Earthly.CHOU).
             put(3, Earthly.YIN).put(4, Earthly.YIN).
@@ -163,8 +163,8 @@ public enum Earthly {
      * @param hour 小时
      * @return 时辰地支
      */
-    public static Earthly getTimeEarthly(int hour) {
-        Earthly earthly = TIME_EARTHLY_MAPPING.get(hour);
+    public static Earthly getHourEarthly(int hour) {
+        Earthly earthly = HOUR_EARTHLY_MAPPING.get(hour);
         if (null == earthly) {
             throw new RuntimeException("timeEarthly is null , hour:" + hour);
         }
