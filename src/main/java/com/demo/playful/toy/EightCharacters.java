@@ -52,7 +52,7 @@ public class EightCharacters {
         for (Map.Entry<DateEnum, Map<HeavenlyStem, Earthly>> entry : map.entrySet()) {
             for (Map.Entry<HeavenlyStem, Earthly> heEntry : entry.getValue().entrySet()) {
                 nameBuilder.append(heEntry.getKey().getName()).append(heEntry.getValue().getName());
-                codeBuilder.append(heEntry.getKey().getCode()).append("-").append(heEntry.getValue().getCode());
+                codeBuilder.append(heEntry.getKey().getCode()).append("|").append(heEntry.getValue().getCode());
                 FiveElements fiveElementsH = FiveElements.getFiveElementsByHeavenlyStem(heEntry.getKey());
                 FiveElements fiveElementsE = FiveElements.getFiveElementsByEarthly(heEntry.getValue());
                 fiveCountMap.put(fiveElementsH, fiveCountMap.containsKey(fiveElementsH) ? fiveCountMap.get(fiveElementsH) + 1 : 1);
@@ -66,10 +66,11 @@ public class EightCharacters {
             fiveBuilder.append(fiveEntry.getKey().getName()).append(fiveEntry.getValue()).append(" ");
         }
         Calendar lunarCal = DateUtils.LunarDate.solarToLunar(birthCal);
-        log.info("公历生日:{}", DateFormatUtils.format(birthCal, "yyyy年MM月dd日 HH时"));
-        log.info("农历生日:{}", DateUtils.LunarDate.lunarDateToString(lunarCal));
-        log.info("生辰八字:{}, {}", nameBuilder.toString(), codeBuilder.toString());
-        log.info("五行:{}", fiveBuilder.toString());
+        log.info("公历生日 : {}", DateFormatUtils.format(birthCal, "yyyy年MM月dd日 HH时"));
+        log.info("农历生日 : {}", DateUtils.LunarDate.lunarDateToString(lunarCal));
+        log.info("生辰八字 : {}", nameBuilder.toString());
+        log.info("八字五行 : {}", fiveBuilder.toString());
+        log.info("八字编码 : {}", codeBuilder.toString());
         log.info("=========================================================");
     }
 
