@@ -6,7 +6,6 @@ import com.google.common.collect.ImmutableMap;
 
 import java.text.ParseException;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
@@ -136,8 +135,8 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
          * @return 返回公历日期对应的农历日期
          */
         public static Calendar solarToLunar(Calendar birthCal) {
-            Date baseDate = new GregorianCalendar(1900, Calendar.JANUARY, 31).getTime();
-            int offset = (int) ((birthCal.getTimeInMillis() - baseDate.getTime()) / 86400000L);
+            Calendar baseCal = new GregorianCalendar(MIN_YEAR, Calendar.JANUARY, 31);
+            int offset = (int) ((birthCal.getTimeInMillis() - baseCal.getTimeInMillis()) / 86400000L);
             // 用offset减去每农历年的天数计算当天是农历第几天
             // iYear最终结果是农历的年份, offset是当年的第几天
             int iYear, daysOfYear = 0;
