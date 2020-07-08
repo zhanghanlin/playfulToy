@@ -31,7 +31,7 @@ public class CalculationEightCharacters {
      * @param args args
      */
     public static void main(String[] args) {
-        List<String> paramList = Arrays.asList("2017-04-14 11", "1990-12-26 11", "1992-01-20 11");
+        List<String> paramList = Arrays.asList("1990-12-26 07", "1992-01-20 11", "2017-04-14 11", "2020-06-23 14");
         for (String birth : paramList) {
             Calendar birthCal = DateUtils.parseCalendar(birth, "yyyy-MM-dd HH");
             EightCharactersDto eightCharacters = calculationEightCharacters(birthCal);
