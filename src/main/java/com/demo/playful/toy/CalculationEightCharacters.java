@@ -38,8 +38,8 @@ public class CalculationEightCharacters {
             log.info("公历生日 : {}", DateFormatUtils.format(eightCharacters.getDate(), "yyyy年MM月dd日 HH时"));
             log.info("农历生日 : {}", DateUtils.LunarDate.lunarDateToString(eightCharacters.getLunarDate()));
             log.info("生辰八字 : {}", eightCharacters.heavenlyStemEarthlyNameToString());
-            log.info("八字五行 : {}", eightCharacters.fiveElementsCountToString());
             log.info("八字编码 : {}", eightCharacters.heavenlyStemEarthlyCodeToString());
+            log.info("八字五行 : {}", eightCharacters.fiveElementsCountToString());
             log.info("=========================================================");
         }
     }
